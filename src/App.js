@@ -16,6 +16,7 @@ function App() {
         console.error('Error fetching location:', error);
       }
     );
+    console.log(position.coords);
   }, []);
 
   return (
