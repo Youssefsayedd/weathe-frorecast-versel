@@ -53,7 +53,7 @@ function CityWeatherDashboard() {
   }, [cityName]);
 
   const fetchWeatherData = (city) => {
-    const apiUrl = `http://api.worldweatheronline.com/premium/v1/weather.ashx?key=2b84d1ebe9824792aae120742242908&q=${city}&format=json&num_of_days=5&extra=localObsTime,isDayTime,utcDateTime&fx=yes&cc=yes&mca=yes&includelocation=yes&show_comments=yes&tp=3&showlocaltime=yes&lang=ar&alerts=yes&aqi=yes`;
+    const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=2b84d1ebe9824792aae120742242908&q=${city}&format=json&num_of_days=5&extra=localObsTime,isDayTime,utcDateTime&fx=yes&cc=yes&mca=yes&includelocation=yes&show_comments=yes&tp=3&showlocaltime=yes&lang=ar&alerts=yes&aqi=yes`;
 
     fetch(apiUrl)
       .then((response) => response.json())

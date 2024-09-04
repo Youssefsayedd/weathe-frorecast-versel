@@ -43,7 +43,7 @@ function LandingDisplay({ coordinates }) {
   const navigate = useNavigate();
 
   const fetchWeatherData = useCallback((latitude, longitude) => {
-    const apiUrl = `http://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${latitude},${longitude}&format=json&num_of_days=7&extra=isDayTime&date=yes&includelocation=yes&tp=12&showlocaltime=yes&lang=ar`;
+    const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${latitude},${longitude}&format=json&num_of_days=7&extra=isDayTime&date=yes&includelocation=yes&tp=12&showlocaltime=yes&lang=ar`;
 
     fetch(apiUrl)
       .then((response) => response.json())
