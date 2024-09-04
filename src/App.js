@@ -1,24 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LandingDisplay from './Screens/LandingDisplay';
+import CityWeatherDashboard from './Screens/CityWeatherDashboard';
 
 function App() {
+  const [coordinates, setCoordinates] = useState(null);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCoordinates({ latitude, longitude });
+      },
+      (error) => {
+        console.error('Error fetching location:', error);
+      }
+    );
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingDisplay coordinates={coordinates} />} />
+        <Route path="/city/:cityName" element={<CityWeatherDashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
