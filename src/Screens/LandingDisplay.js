@@ -308,12 +308,9 @@ function LandingDisplay({ coordinates }) {
                   </div>
                 </div>
               </div>
-              {/* Weather Condition */}
-              <div className="text-center mb-8">
-                <div className="text-5xl font-bold">{weatherCondition}</div>
-              </div>
+             
               {/* Search Bar and States Dropdown */}
-              <div className="flex justify-center rounded-l-lg mb-8">
+              <div className="flex justify-center rounded-l-lg  mb-8">
                 <select
                   value={selectedState}
                   onChange={handleStateSelect}
@@ -340,6 +337,10 @@ function LandingDisplay({ coordinates }) {
                 >
                   Search
                 </button>
+              </div>
+               {/* Weather Condition */}
+               <div className="text-center mb-8 mt-8">
+                <div className="text-5xl font-bold">{weatherCondition}</div>
               </div>
               <Forecast forecastData={forecastData} />
             </div>
