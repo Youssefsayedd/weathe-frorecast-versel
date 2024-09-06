@@ -57,6 +57,7 @@ function CityWeatherDashboard() {
 
   const fetchWeatherData = (city) => {
     const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=2b84d1ebe9824792aae120742242908&q=${city}&format=json&num_of_days=5&extra=localObsTime,isDayTime,utcDateTime&fx=yes&cc=yes&mca=yes&includelocation=yes&show_comments=yes&tp=3&showlocaltime=yes&lang=ar&alerts=yes&aqi=yes`;
+    console.log("city"+city)
 
     fetch(apiUrl)
       .then((response) => response.json())
@@ -253,7 +254,7 @@ function CityWeatherDashboard() {
           </div>
           
           <div className="text-center mb-8">
-            <div className="text-4xl md:text-7xl font-bold">{nearestArea?.areaName?.[0]?.value}</div>
+            <div className="text-4xl md:text-7xl font-bold">{cityName}</div>
             <div className="text-2xl md:text-3xl font-light mt-1">{nearestArea?.country?.[0]?.value}</div>
             <div className="text-lg mt-2">{new Date().toLocaleDateString()}</div>
             <div className="text-lg mt-2">City Local Time: {localTimeWithoutDate}</div>
