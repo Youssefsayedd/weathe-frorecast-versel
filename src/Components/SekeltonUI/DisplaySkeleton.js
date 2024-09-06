@@ -49,89 +49,7 @@ function DisplaySkeleton({ coordinates }) {
   const location = useLocation();
 
   // Fetch weather data from the API
-  const fetchWeatherData = useCallback((latitude, longitude) => {
-    setLoading(true);
-    const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${latitude},${longitude}&format=json&num_of_days=7&extra=isDayTime&date=yes&includelocation=yes&tp=12&showlocaltime=yes&lang=ar`;
-
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        if (
-          data?.data?.current_condition?.length > 0 &&
-          data?.data?.nearest_area?.length > 0
-        ) {
-          const currentCondition = data.data.current_condition[0];
-          const nearestArea = data.data.nearest_area[0];
-          const forecast = data.data.weather;
-
-          setWeatherData(data);
-          setCityName(nearestArea.areaName[0].value);
-          setCountryName(nearestArea.country[0].value);
-          setTemperature(currentCondition.temp_C);
-          setWindSpeed(currentCondition.windspeedKmph);
-          setHumidity(currentCondition.humidity);
-          setWeatherCondition(currentCondition.weatherDesc[0].value);
-          setWeatherIcon(currentCondition.weatherIconUrl[0].value);
-          setForecastData(forecast);
-          setIsDay(currentCondition.isdaytime === 'yes');
-          setBackgroundClass(
-            getBackgroundClass(
-              currentCondition.weatherDesc[0].value,
-              currentCondition.isdaytime === 'yes'
-            )
-          );
-          setLocalTime(data.data.time_zone[0].localtime.split(' ')[1]);
-
-          // Fetch states when country name is set
-          const country = Country.getAllCountries().find(
-            (c) => c.name === nearestArea.country[0].value
-          );
-          if (country) {
-            const countryStates = State.getStatesOfCountry(country.isoCode);
-            setStates(countryStates);
-          }
-        } else {
-          alert('City not found. Please try another search.');
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching weather data:', error);
-        alert('An error occurred while fetching the data. Please try again.');
-        setLoading(false);
-      });
-  }, []);
-
-  // Fetch user's geolocation
-  useEffect(() => {
-    if (!currentCoordinates) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setCoordinates({ latitude, longitude });
-        },
-        (error) => {
-          console.error('Error fetching location:', error.message);
-          alert('Unable to fetch your location. Please enable location services.');
-        }
-      );
-    }
-  }, [currentCoordinates]);
-
-  // Fetch weather data based on coordinates or after navigating back
-  useEffect(() => {
-    if (currentCoordinates) {
-      fetchWeatherData(currentCoordinates.latitude, currentCoordinates.longitude);
-    }
-  }, [currentCoordinates, fetchWeatherData]);
-
-  // Trigger fetch when coming back from cityDashboard
-  useEffect(() => {
-    if (location.state?.from === 'cityDashboard' && currentCoordinates) {
-      fetchWeatherData(currentCoordinates.latitude, currentCoordinates.longitude);
-    }
-  }, [location, currentCoordinates, fetchWeatherData]);
-
+  
   // Get background class based on condition
   const getBackgroundClass = (condition, isDay) => {
     const normalizedCondition = condition.toLowerCase();
@@ -149,49 +67,10 @@ function DisplaySkeleton({ coordinates }) {
   };
 
   // Handle search query for city or state
-  const handleSearch = () => {
-    if (searchQuery) {
-      const state = states.find(s => s.name === searchQuery);
-      if (state) {
-        fetchWeatherData(state.latitude, state.longitude);
-      } else {
-        const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1`;
 
-        fetch(apiUrl)
-          .then((response) => response.json())
-          .then((data) => {
-            if (data?.data?.error) {
-              alert('City not found. Please try another search.');
-            } else {
-              navigate(`/city/${searchQuery}`);
-            }
-          })
-          .catch((error) => {
-            console.error('Error fetching city data:', error);
-            alert('An error occurred while fetching the data. Please try again.');
-          });
-      }
-    }
-  };
-
-  const getDayName = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { weekday: 'short' });
-  };
 
   // Handle state selection from dropdown
-  const handleStateSelect = (e) => {
-    const state = e.target.value;
-    setSelectedState(state);
-    setSearchQuery(state);
-  };
 
-  // Handle Enter key press in search bar
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
 
   return (
     <div
@@ -260,7 +139,7 @@ function DisplaySkeleton({ coordinates }) {
                   <div className="text-7xl font-bold">{cityName}</div>
                   <div className="text-3xl font-light mt-1">{countryName}</div>
                   <div className="text-lg mt-2">
-                    {getDayName(new Date())} {new Date().toLocaleDateString()}
+                 
                   </div>
                   <div className="text-lg mt-2">{localTime}</div>
                 </div>
@@ -309,33 +188,27 @@ function DisplaySkeleton({ coordinates }) {
               {/* Search Bar and States Dropdown */}
               <div className="flex justify-center mb-8">
                 <select
-                  value={selectedState}
-                  onChange={handleStateSelect}
+                  value=""
+                  
                   className="px-4 py-2 rounded-l-lg bg-white bg-opacity-20 text-white focus:outline-none"
                 >
                   <option value="">Select State</option>
-                  {states.map((state) => (
-                    <option key={state.isoCode} value={state.name}>
-                      {state.name}
-                    </option>
-                  ))}
+                  {}
                 </select>
                 <input
                   type="text"
                   placeholder="Search for a city or state"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                
                   className="px-4 py-2 bg-white bg-opacity-20 text-white placeholder-white focus:outline-none"
                 />
                 <button
-                  onClick={handleSearch}
+                 
                   className="px-4 py-2 rounded-r-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 focus:outline-none"
                 >
                   Search
                 </button>
               </div>
-              <Forecast forecastData={forecastData} />
+             
             </div>
           ) : (
             <p className="text-lg">Loading weather data...</p>

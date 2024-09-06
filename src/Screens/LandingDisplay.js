@@ -161,7 +161,7 @@ function LandingDisplay({ coordinates }) {
         console.log("rere" + region);
         navigate(`/city/${region}`);
       } else {
-        const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1`;
+        const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1&includelocation=yes`;
 
         fetch(apiUrl)
           .then((response) => response.json())
@@ -169,7 +169,9 @@ function LandingDisplay({ coordinates }) {
             if (data?.data?.error) {
               alert('City not found. Please try another search.');
             } else {
-              navigate(`/city/${searchQuery}`);
+              console.log("City is" + data.data.nearest_area[0].areaName[0].value);
+              const cityname=data.data.nearest_area[0].areaName[0].value;
+              navigate(`/city/${cityname}`);
             }
           })
           .catch((error) => {
