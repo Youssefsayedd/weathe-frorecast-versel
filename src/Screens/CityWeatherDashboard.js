@@ -14,6 +14,7 @@ import ClimateLineChart from '../Components/Charts/LineChart';
 import HumidityChart from '../Components/Charts/HumidityChart';
 import UVChart from '../Components/Charts/UVChart';
 import DisplaySkeleton from '../Components/SekeltonUI/DisplaySkeleton';
+import { API } from '../config';
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, BarController, BarElement, Title, Tooltip);
 
@@ -56,7 +57,7 @@ function CityWeatherDashboard() {
   }, [cityName]);
 
   const fetchWeatherData = (city) => {
-    const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=2b84d1ebe9824792aae120742242908&q=${city}&format=json&num_of_days=5&extra=localObsTime,isDayTime,utcDateTime&fx=yes&cc=yes&mca=yes&includelocation=yes&show_comments=yes&tp=3&showlocaltime=yes&lang=ar&alerts=yes&aqi=yes`;
+    const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${city}&format=json&num_of_days=5&extra=localObsTime,isDayTime,utcDateTime&fx=yes&cc=yes&mca=yes&includelocation=yes&show_comments=yes&tp=3&showlocaltime=yes&lang=ar&alerts=yes&aqi=yes`;
     console.log("city"+city)
 
     fetch(apiUrl)
@@ -308,11 +309,11 @@ function CityWeatherDashboard() {
           {/* Humidity and UV Charts */}
           <div className="mt-8 w-full grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-4 text-white">Humidity Chart</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-7 text-white">Humidity Chart</h2>
               <HumidityChart data={hourlyData} />
             </div>
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-4 text-white">UV Index Chart</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-7 text-white">UV Index Chart</h2>
               <UVChart data={hourlyData} />
             </div>
           </div>
