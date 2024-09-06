@@ -12,12 +12,11 @@ function ClimateLineChart({ data }) {
 
   const drawChart = () => {
     const container = d3.select(chartRef.current).node().parentNode;
-    const svgWidth = container.getBoundingClientRect().width; 
+    const svgWidth = container.getBoundingClientRect().width;
     const svgHeight = 400;
     const margin = { top: 50, right: 50, bottom: 50, left: 50 };
     const width = svgWidth - margin.left - margin.right;
     const height = svgHeight - margin.top - margin.bottom;
-
 
     d3.select(chartRef.current).selectAll('*').remove();
 
@@ -32,8 +31,9 @@ function ClimateLineChart({ data }) {
       .range([0, width])
       .padding(0.1);
 
+    // Updated yScale to include negative values, with minimum -10°C
     const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => Math.max(+d.absMaxTemp, +d.avgMinTemp))])
+      .domain([d3.min(data, d => Math.min(+d.absMaxTemp, +d.avgMinTemp)), d3.max(data, d => Math.max(+d.absMaxTemp, +d.avgMinTemp))])
       .range([height, 0]);
 
     const lineMaxTemp = d3.line()
@@ -48,7 +48,6 @@ function ClimateLineChart({ data }) {
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(xScale));
 
- 
     svg.append('g')
       .call(d3.axisLeft(yScale));
 
@@ -153,9 +152,7 @@ function ClimateLineChart({ data }) {
       .attr('fill', 'white');
   };
 
-  return (
-    <svg ref={chartRef}></svg>
-  );
+  return <svg ref={chartRef}></svg>;
 }
 
 export default ClimateLineChart;

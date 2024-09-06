@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { API } from '../config';
+import { API } from '../../config';
 import { Country, State, City } from 'country-state-city';
-import windIcon from '../assets/weatheIcons/wind (2).png';
-import humidityIcon from '../assets/weatheIcons/water-drop.png';
-import temperatureIcon from '../assets/weatheIcons/thermometer.png';
-import dayBackgroundImage from '../assets/backGrounds/sky.png';
-import nightBackgroundImage from '../assets/backGrounds/pngegg.png';
+import windIcon from '../../assets/weatheIcons/wind (2).png';
+import humidityIcon from '../../assets/weatheIcons/water-drop.png';
+import temperatureIcon from '../../assets/weatheIcons/thermometer.png';
+import dayBackgroundImage from '../../assets/backGrounds/sky.png';
+import nightBackgroundImage from '../../assets/backGrounds/pngegg.png';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Forecast from '../Components/WeatherComponents/ForcastComponent';
-import LandingDisplaySkeleton from '../Components/SekeltonUI/DisplaySkeleton';
+import Forecast from '../WeatherComponents/ForcastComponent';
 
 const conditionToGradientClass = {
   sunny: 'bg-gradient-to-b from-yellow-300 via-yellow-200 to-yellow-100',
@@ -28,7 +27,7 @@ const conditionToGradientClass = {
   night_foggy: 'bg-gradient-to-b from-gray-800 to-black',
 };
 
-function LandingDisplay({ coordinates }) {
+function DisplaySkeleton({ coordinates }) {
   const [weatherData, setWeatherData] = useState(null);
   const [countryName, setCountryName] = useState(null);
   const [cityName, setCityName] = useState(null);
@@ -45,11 +44,13 @@ function LandingDisplay({ coordinates }) {
   const [currentCoordinates, setCoordinates] = useState(coordinates || null);
   const [states, setStates] = useState([]); // New state for storing states of the country
   const [selectedState, setSelectedState] = useState(''); // State for selected state
+  const [loading, setLoading] = useState(false); // New state for loading status
   const navigate = useNavigate();
   const location = useLocation();
 
   // Fetch weather data from the API
   const fetchWeatherData = useCallback((latitude, longitude) => {
+    setLoading(true);
     const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${latitude},${longitude}&format=json&num_of_days=7&extra=isDayTime&date=yes&includelocation=yes&tp=12&showlocaltime=yes&lang=ar`;
 
     fetch(apiUrl)
@@ -92,10 +93,12 @@ function LandingDisplay({ coordinates }) {
         } else {
           alert('City not found. Please try another search.');
         }
+        setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching weather data:', error);
         alert('An error occurred while fetching the data. Please try again.');
+        setLoading(false);
       });
   }, []);
 
@@ -148,26 +151,25 @@ function LandingDisplay({ coordinates }) {
   // Handle search query for city or state
   const handleSearch = () => {
     if (searchQuery) {
-      
       const state = states.find(s => s.name === searchQuery);
       if (state) {
-        navigate(`/city/${state.latitude},${state.longitude}`);
+        fetchWeatherData(state.latitude, state.longitude);
       } else {
-        const apiUrl = `http://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1`;
+        const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1`;
 
-      fetch(apiUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data?.data?.error) {
-            alert('City not found. Please try another search.');
-          } else {
-            navigate(`/city/${searchQuery}`);
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching city data:', error);
-          alert('An error occurred while fetching the data. Please try again.');
-        });
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data?.data?.error) {
+              alert('City not found. Please try another search.');
+            } else {
+              navigate(`/city/${searchQuery}`);
+            }
+          })
+          .catch((error) => {
+            console.error('Error fetching city data:', error);
+            alert('An error occurred while fetching the data. Please try again.');
+          });
       }
     }
   };
@@ -190,7 +192,6 @@ function LandingDisplay({ coordinates }) {
       handleSearch();
     }
   };
-  
 
   return (
     <div
@@ -206,7 +207,52 @@ function LandingDisplay({ coordinates }) {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-80"></div>
       {currentCoordinates ? (
         <div className="bg-white bg-opacity-10 backdrop-blur-md p-8 rounded-2xl shadow-xl max-w-lg w-full lg:max-w-7xl z-10">
-          {weatherData ? (
+          {loading ? (
+            <div className="flex flex-col text-white">
+              {/* Skeleton UI for Weather Info */}
+              <div className="flex justify-between items-center">
+                <div className="flex flex-col">
+                  <div className="w-48 h-12 bg-gray-300 rounded-lg animate-pulse"></div>
+                  <div className="w-32 h-8 bg-gray-300 rounded-lg mt-2 animate-pulse"></div>
+                  <div className="w-24 h-6 bg-gray-300 rounded-lg mt-4 animate-pulse"></div>
+                  <div className="w-24 h-6 bg-gray-300 rounded-lg mt-2 animate-pulse"></div>
+                </div>
+                <div className="flex flex-col items-start">
+                  <div className="flex items-center mb-8">
+                    <div className="w-16 h-16 bg-gray-300 rounded-full mr-4 animate-pulse"></div>
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-gray-300 rounded-full mr-2 animate-pulse"></div>
+                      <div className="w-16 h-16 bg-gray-300 rounded-lg animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="flex space-x-6 text-sm">
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 bg-gray-300 rounded-full mr-1 animate-pulse"></div>
+                      <div className="w-20 h-4 bg-gray-300 rounded-lg animate-pulse"></div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 bg-gray-300 rounded-full mr-1 animate-pulse"></div>
+                      <div className="w-20 h-4 bg-gray-300 rounded-lg animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Skeleton UI for Weather Condition */}
+              <div className="text-center mb-8">
+                <div className="w-48 h-12 bg-gray-300 rounded-lg mx-auto animate-pulse"></div>
+              </div>
+              {/* Skeleton UI for Search Bar and States Dropdown */}
+              <div className="flex justify-center mb-8">
+                <div className="w-48 h-10 bg-gray-300 rounded-lg animate-pulse"></div>
+                <div className="w-48 h-10 bg-gray-300 rounded-lg mx-2 animate-pulse"></div>
+                <div className="w-24 h-10 bg-gray-300 rounded-lg animate-pulse"></div>
+              </div>
+              {/* Skeleton UI for Forecast */}
+              <div className="flex justify-center">
+                <div className="w-full h-48 bg-gray-300 rounded-lg animate-pulse"></div>
+              </div>
+            </div>
+          ) : weatherData ? (
             <div className="flex flex-col text-white">
               {/* Weather Info */}
               <div className="flex justify-between items-center ">
@@ -261,26 +307,26 @@ function LandingDisplay({ coordinates }) {
                 <div className="text-5xl font-bold">{weatherCondition}</div>
               </div>
               {/* Search Bar and States Dropdown */}
-              <div className="flex justify-center rounded-l-lg mb-8">
-               {/*<select
-                  value="none"
+              <div className="flex justify-center mb-8">
+                <select
+                  value={selectedState}
                   onChange={handleStateSelect}
-                  className="rounded-l-lg bg-white bg-opacity-20 text-white focus:outline-none"
+                  className="px-4 py-2 rounded-l-lg bg-white bg-opacity-20 text-white focus:outline-none"
                 >
-                  <option value="none">Select City</option>
+                  <option value="">Select State</option>
                   {states.map((state) => (
-                    <option key={state.isoCode} value={state.name} className='text-black'>
+                    <option key={state.isoCode} value={state.name}>
                       {state.name}
                     </option>
                   ))}
-                </select>*/}
+                </select>
                 <input
                   type="text"
-                  placeholder="Search for a city "
+                  placeholder="Search for a city or state"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  className="px-4 py-2 bg-white rounded-l-lg bg-opacity-20 text-white placeholder-white focus:outline-none"
+                  className="px-4 py-2 bg-white bg-opacity-20 text-white placeholder-white focus:outline-none"
                 />
                 <button
                   onClick={handleSearch}
@@ -302,4 +348,4 @@ function LandingDisplay({ coordinates }) {
   );
 }
 
-export default LandingDisplay;
+export default DisplaySkeleton;

@@ -13,6 +13,7 @@ import nightBackgroundImage from '../assets/backGrounds/pngegg.png';
 import ClimateLineChart from '../Components/Charts/LineChart';
 import HumidityChart from '../Components/Charts/HumidityChart';
 import UVChart from '../Components/Charts/UVChart';
+import DisplaySkeleton from '../Components/SekeltonUI/DisplaySkeleton';
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, BarController, BarElement, Title, Tooltip);
 
@@ -215,7 +216,7 @@ function CityWeatherDashboard() {
   }, [hourlyData]);
 
   if (!weatherData) {
-    return <p className="text-lg">Loading weather data...</p>;
+    return <DisplaySkeleton/>;
   }
 
   const currentCondition = weatherData?.data?.current_condition?.[0];
