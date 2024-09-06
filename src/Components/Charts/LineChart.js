@@ -33,7 +33,7 @@ function ClimateLineChart({ data }) {
 
     // Updated yScale to include negative values, with minimum 
     const yScale = d3.scaleLinear()
-      .domain([d3.min(data, d => Math.min(+d.absMaxTemp, +d.avgMinTemp)), d3.max(data, d => Math.max(+d.absMaxTemp, +d.avgMinTemp))])
+      .domain([-15, d3.max(data, d => Math.max(+d.absMaxTemp, +d.avgMinTemp))])
       .range([height, 0]);
 
     const lineMaxTemp = d3.line()
