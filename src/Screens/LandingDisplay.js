@@ -9,6 +9,7 @@ import nightBackgroundImage from '../assets/backGrounds/pngegg.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Forecast from '../Components/WeatherComponents/ForcastComponent';
 import LandingDisplaySkeleton from '../Components/SekeltonUI/DisplaySkeleton';
+import SearchBar from '../Components/WeatherComponents/SearchBar'; // Import the new SearchBar component
 
 const statescoor = {
   "Suez": { latitude: 29.9668, langitude: 32.5498 },
@@ -308,38 +309,18 @@ function LandingDisplay({ coordinates }) {
                   </div>
                 </div>
               </div>
-             
               {/* Search Bar and States Dropdown */}
-              <div className="flex justify-center rounded-l-lg  mb-8">
-                <select
-                  value={selectedState}
-                  onChange={handleStateSelect}
-                  className="rounded-l-lg bg-white bg-opacity-20 text-white focus:outline-none"
-                >
-                  <option value="">Select City</option>
-                  {states.map((state) => (
-                    <option key={state.isoCode} value={state.name} className='text-black'>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  placeholder="Search for a city "
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="px-4 py-2 bg-white  bg-opacity-20 text-white placeholder-white focus:outline-none"
-                />
-                <button
-                  onClick={handleSearch}
-                  className="px-4 py-2 rounded-r-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 focus:outline-none"
-                >
-                  Search
-                </button>
-              </div>
-               {/* Weather Condition */}
-               <div className="text-center mb-8 mt-8">
+              <SearchBar
+                states={states}
+                selectedState={selectedState}
+                onStateSelect={handleStateSelect}
+                searchQuery={searchQuery}
+                onSearchQueryChange={(e) => setSearchQuery(e.target.value)}
+                onSearch={handleSearch}
+                onKeyPress={handleKeyPress}
+              />
+              {/* Weather Condition */}
+              <div className="text-center mb-8 mt-8">
                 <div className="text-5xl font-bold">{weatherCondition}</div>
               </div>
               <Forecast forecastData={forecastData} />
