@@ -5,7 +5,7 @@ import humidityIcon from '../assets/weatheIcons/water-drop.png';
 import temperatureIcon from '../assets/weatheIcons/thermometer.png';
 import dayBackgroundImage from '../assets/backGrounds/sky.png';
 import nightBackgroundImage from '../assets/backGrounds/pngegg.png';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Forecast from '../Components/WeatherComponents/ForcastComponent';
 
 const conditionToGradientClass = {
@@ -40,8 +40,11 @@ function LandingDisplay({ coordinates }) {
   const [isDay, setIsDay] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [localTime, setLocalTime] = useState('');
+  const [currentCoordinates, setCoordinates] = useState(coordinates || null);
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Fetch weather data from the API
   const fetchWeatherData = useCallback((latitude, longitude) => {
     const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${latitude},${longitude}&format=json&num_of_days=7&extra=isDayTime&date=yes&includelocation=yes&tp=12&showlocaltime=yes&lang=ar`;
 
@@ -83,12 +86,37 @@ function LandingDisplay({ coordinates }) {
       });
   }, []);
 
+  // Fetch user's geolocation
   useEffect(() => {
-    if (coordinates) {
-      fetchWeatherData(coordinates.latitude, coordinates.longitude);
+    if (!currentCoordinates) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCoordinates({ latitude, longitude });
+        },
+        (error) => {
+          console.error('Error fetching location:', error.message);
+          alert('Unable to fetch your location. Please enable location services.');
+        }
+      );
     }
-  }, [coordinates, fetchWeatherData]);
+  }, [currentCoordinates]);
 
+  // Fetch weather data based on coordinates or after navigating back
+  useEffect(() => {
+    if (currentCoordinates) {
+      fetchWeatherData(currentCoordinates.latitude, currentCoordinates.longitude);
+    }
+  }, [currentCoordinates, fetchWeatherData]);
+
+  // Trigger fetch when coming back from cityDashboard
+  useEffect(() => {
+    if (location.state?.from === 'cityDashboard' && currentCoordinates) {
+      fetchWeatherData(currentCoordinates.latitude, currentCoordinates.longitude);
+    }
+  }, [location, currentCoordinates, fetchWeatherData]);
+
+  // Get background class based on condition
   const getBackgroundClass = (condition, isDay) => {
     const normalizedCondition = condition.toLowerCase();
     if (!isDay) {
@@ -104,6 +132,7 @@ function LandingDisplay({ coordinates }) {
     return conditionToGradientClass[normalizedCondition] || 'bg-gradient-to-b from-blue-400 to-gray-400';
   };
 
+  // Handle search query for city
   const handleSearch = () => {
     if (searchQuery) {
       const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1`;
@@ -141,11 +170,11 @@ function LandingDisplay({ coordinates }) {
     >
       <div className={`absolute inset-0 ${backgroundClass} ${isDay ? 'opacity-40' : 'opacity-60'}`}></div>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-80"></div>
-      {coordinates ? (
+      {currentCoordinates ? (
         <div className="bg-white bg-opacity-10 backdrop-blur-md p-8 rounded-2xl shadow-xl max-w-lg w-full lg:max-w-7xl z-10">
           {weatherData ? (
             <div className="flex flex-col text-white">
-              {/*Weather Info */}
+              {/* Weather Info */}
               <div className="flex justify-between items-center ">
                 <div className="flex flex-col">
                   <div className="text-7xl font-bold">{cityName}</div>
@@ -193,7 +222,7 @@ function LandingDisplay({ coordinates }) {
                   </div>
                 </div>
               </div>
-              {/* Weather Condition  */}
+              {/* Weather Condition */}
               <div className="text-center mb-8">
                 <div className="text-5xl font-bold">{weatherCondition}</div>
               </div>
