@@ -153,7 +153,7 @@ function LandingDisplay({ coordinates }) {
       if (state) {
         navigate(`/city/${state.latitude},${state.longitude}`);
       } else {
-        const apiUrl = `http://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1`;
+        const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1`;
 
       fetch(apiUrl)
         .then((response) => response.json())
