@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, BarController, BarElement, Title, Tooltip } from 'chart.js';
+import { FaArrowLeft } from 'react-icons/fa';
 import windIcon from '../assets/weatheIcons/wind (2).png';
 import humidityIcon from '../assets/weatheIcons/water-drop.png';
 import temperatureIcon from '../assets/weatheIcons/hot (1).png';
@@ -47,6 +48,7 @@ function CityWeatherDashboard() {
   const windChartRef = useRef(null);
   const temperatureChartInstance = useRef(null);
   const windChartInstance = useRef(null);
+  const navigate=useNavigate();
 
   useEffect(() => {
     fetchWeatherData(cityName);
@@ -235,6 +237,13 @@ function CityWeatherDashboard() {
     >
       <div className={`absolute inset-0 ${backgroundClass} opacity-60`}></div> 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div> 
+      <button
+        onClick={() => navigate(-1)} // Use navigate to go back
+        className="absolute top-4 left-4 bg-white bg-opacity-30 p-2 rounded-full hover:bg-opacity-50 transition-all"
+        aria-label="Go back"
+      >
+        <FaArrowLeft className="text-white w-6 h-6" />
+      </button>
       <div className="bg-white bg-opacity-10 backdrop-blur-md p-8 rounded-2xl shadow-xl max-w-lg w-full lg:max-w-7xl z-10">
         <div className="flex flex-col text-white space-y-6">
           <div className="absolute top-4 right-4 mt-12 mr-12 flex items-center space-x-7">
@@ -243,61 +252,65 @@ function CityWeatherDashboard() {
           </div>
           
           <div className="text-center mb-8">
-            <div className="text-7xl font-bold">{nearestArea?.areaName?.[0]?.value}</div>
-            <div className="text-3xl font-light mt-1">{nearestArea?.country?.[0]?.value}</div>
+            <div className="text-4xl md:text-7xl font-bold">{nearestArea?.areaName?.[0]?.value}</div>
+            <div className="text-2xl md:text-3xl font-light mt-1">{nearestArea?.country?.[0]?.value}</div>
             <div className="text-lg mt-2">{new Date().toLocaleDateString()}</div>
             <div className="text-lg mt-2">City Local Time: {localTimeWithoutDate}</div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {/* Weather Details */}
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             <div className="flex flex-col items-center p-6 bg-white bg-opacity-20 rounded-lg">
-              <img src={temperatureIcon} alt="Temperature Icon" className="w-12 h-12 mb-3" />
-              <div className="text-3xl font-bold">{currentCondition?.temp_C}°</div>
-              <div className="text-lg">Temperature</div>
+              <img src={temperatureIcon} alt="Temperature Icon" className="w-10 md:w-12 h-10 md:h-12 mb-3" />
+              <div className="text-2xl md:text-3xl font-bold">{currentCondition?.temp_C}°</div>
+              <div className="text-sm md:text-lg">Temperature</div>
             </div>
             <div className="flex flex-col items-center p-6 bg-white bg-opacity-20 rounded-lg">
-              <img src={windIcon} alt="Wind Icon" className="w-12 h-12 mb-3" />
-              <div className="text-lg font-medium">Wind: {currentCondition?.windspeedKmph} km/h</div>
+              <img src={windIcon} alt="Wind Icon" className="w-10 md:w-12 h-10 md:h-12 mb-3" />
+              <div className="text-md md:text-lg font-medium">Wind: {currentCondition?.windspeedKmph} km/h</div>
             </div>
             <div className="flex flex-col items-center p-6 bg-white bg-opacity-20 rounded-lg">
-              <img src={humidityIcon} alt="Humidity Icon" className="w-12 h-12 mb-3" />
-              <div className="text-lg font-medium">Humidity: {currentCondition?.humidity}%</div>
+              <img src={humidityIcon} alt="Humidity Icon" className="w-10 md:w-12 h-10 md:h-12 mb-3" />
+              <div className="text-md md:text-lg font-medium">Humidity: {currentCondition?.humidity}%</div>
             </div>
             <div className="flex flex-col items-center p-6 bg-white bg-opacity-20 rounded-lg">
-              <img src={visibilityIcon} alt="Visibility Icon" className="w-12 h-12 mb-3" />
-              <div className="text-lg font-medium">Visibility: {currentCondition?.visibility} km</div>
+              <img src={visibilityIcon} alt="Visibility Icon" className="w-10 md:w-12 h-10 md:h-12 mb-3" />
+              <div className="text-md md:text-lg font-medium">Visibility: {currentCondition?.visibility} km</div>
             </div>
             <div className="flex flex-col items-center p-6 bg-white bg-opacity-20 rounded-lg">
-              <img src={cloudIcon} alt="Cloud Cover Icon" className="w-12 h-12 mb-3" />
-              <div className="text-lg font-medium">Cloud Cover: {currentCondition?.cloudcover}%</div>
+              <img src={cloudIcon} alt="Cloud Cover Icon" className="w-10 md:w-12 h-10 md:h-12 mb-3" />
+              <div className="text-md md:text-lg font-medium">Cloud Cover: {currentCondition?.cloudcover}%</div>
             </div>
             <div className="flex flex-col items-center p-6 bg-white bg-opacity-20 rounded-lg">
-              <img src={feelsLikeIcon} alt="Feels Like Icon" className="w-12 h-12 mb-3" />
-              <div className="text-lg font-medium">Feels Like: {currentCondition?.FeelsLikeC}°C</div>
+              <img src={feelsLikeIcon} alt="Feels Like Icon" className="w-10 md:w-12 h-10 md:h-12 mb-3" />
+              <div className="text-md md:text-lg font-medium">Feels Like: {currentCondition?.FeelsLikeC}°C</div>
             </div>
           </div>
 
+          {/* Climate and Hourly Data */}
           <div className="mt-8 w-full">
-            <h2 className="text-3xl font-bold mb-4 text-white">Monthly Climate Averages</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">Monthly Climate Averages</h2>
             <ClimateLineChart data={climateData} />
           </div>
 
           <div className="mt-8 w-full h-64">
-            <h2 className="text-3xl font-bold mb-4 text-white">Hourly Temperature</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">Hourly Temperature</h2>
             <canvas ref={temperatureChartRef} className="w-full h-full"></canvas>
           </div>
+
           <div className="mt-8 w-full h-64">
-            <h2 className="text-3xl font-bold mb-4 text-white">Wind Speed</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">Wind Speed</h2>
             <canvas ref={windChartRef} className="w-full h-full"></canvas>
           </div>
           
-          <div className="mt-8 w-full grid grid-cols-2 md:grid-cols-2 gap-8">
+          {/* Humidity and UV Charts */}
+          <div className="mt-8 w-full grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-3xl font-bold mb-4 mt-4 text-white">Humidity Chart</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-4 text-white">Humidity Chart</h2>
               <HumidityChart data={hourlyData} />
             </div>
             <div>
-              <h2 className="text-3xl font-bold mb-4 mt-4 text-white">UV Index Chart</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-4 text-white">UV Index Chart</h2>
               <UVChart data={hourlyData} />
             </div>
           </div>
