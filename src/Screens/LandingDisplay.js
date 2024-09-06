@@ -9,14 +9,12 @@ import nightBackgroundImage from '../assets/backGrounds/pngegg.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Forecast from '../Components/WeatherComponents/ForcastComponent';
 import LandingDisplaySkeleton from '../Components/SekeltonUI/DisplaySkeleton';
-//import statescoor from '../assets/Data/dummy'
-const statescoor={
-  "Suez":{latitude:29.9668,langitude:32.5498},
-  "Port Said":{latitude:31.2653,langitude:32.3019},
-  "Luxor":{latitude:25.6872,langitude:32.6396},
 
-  
-}
+const statescoor = {
+  "Suez": { latitude: 29.9668, langitude: 32.5498 },
+  "Port Said": { latitude: 31.2653, langitude: 32.3019 },
+  "Luxor": { latitude: 25.6872, langitude: 32.6396 },
+};
 
 const conditionToGradientClass = {
   sunny: 'bg-gradient-to-b from-yellow-300 via-yellow-200 to-yellow-100',
@@ -60,7 +58,7 @@ function LandingDisplay({ coordinates }) {
   // Fetch weather data from the API
   const fetchWeatherData = useCallback((latitude, longitude) => {
     const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${latitude},${longitude}&format=json&num_of_days=7&extra=isDayTime&date=yes&includelocation=yes&tp=12&showlocaltime=yes&lang=ar`;
-
+    console.log("visited")
     fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
@@ -157,29 +155,26 @@ function LandingDisplay({ coordinates }) {
   // Handle search query for city or state
   const handleSearch = () => {
     if (searchQuery) {
-      
       const state = states.find(s => s.name === searchQuery);
-      
-      
       if (state) {
-        console.log("rere"+region);
+        console.log("rere" + region);
         navigate(`/city/${region}`);
       } else {
         const apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${searchQuery}&format=json&num_of_days=1`;
 
-      fetch(apiUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data?.data?.error) {
-            alert('City not found. Please try another search.');
-          } else {
-            navigate(`/city/${searchQuery}`);
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching city data:', error);
-          alert('An error occurred while fetching the data. Please try again.');
-        });
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data?.data?.error) {
+              alert('City not found. Please try another search.');
+            } else {
+              navigate(`/city/${searchQuery}`);
+            }
+          })
+          .catch((error) => {
+            console.error('Error fetching city data:', error);
+            alert('An error occurred while fetching the data. Please try again.');
+          });
       }
     }
   };
@@ -194,69 +189,52 @@ function LandingDisplay({ coordinates }) {
     const state = e.target.value;
     const stated = states.find(s => s.name === state);
     const cityCoordinates = statescoor[stated.name];
-      console.log("stae"+typeof(stated.name)+cityCoordinates)
-    console.log(cityCoordinates!=undefined);
+    console.log("stae" + typeof (stated.name) + cityCoordinates)
+    console.log(cityCoordinates != undefined);
     //console.log(cityCoordinates.latitude+" "+cityCoordinates.langitude);
-    console.log(stated.latitude+" "+stated.longitude);
+    console.log(stated.latitude + " " + stated.longitude);
     let apiUrl;
-    if(cityCoordinates!=undefined)
-    {
+    if (cityCoordinates != undefined) {
       apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${cityCoordinates.latitude},${cityCoordinates.langitude}&format=json&num_of_days=7&extra=isDayTime&date=yes&includelocation=yes&tp=12&showlocaltime=yes&lang=ar`;
       fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        if (
-          data?.data?.current_condition?.length > 0 &&
-          data?.data?.nearest_area?.length > 0
-        ) {
-          const currentCondition = data.data.current_condition[0];
-          const nearestArea = data.data.nearest_area[0];
-          const forecast = data.data.weather;
-          console.log("region"+nearestArea.areaName[0].value);
-          setregion(nearestArea.areaName[0].value);
-
-       
-         
-
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching weather data:', error);
-        alert('An error occurred while fetching the data. Please try again.');
-      });
-
-    }
-    else{
+        .then((response) => response.json())
+        .then((data) => {
+          if (
+            data?.data?.current_condition?.length > 0 &&
+            data?.data?.nearest_area?.length > 0
+          ) {
+            const nearestArea = data.data.nearest_area[0];
+            console.log("region" + nearestArea.areaName[0].value);
+            setregion(nearestArea.areaName[0].value);
+            navigate(`/city/${nearestArea.areaName[0].value}`);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching weather data:', error);
+          alert('An error occurred while fetching the data. Please try again.');
+        });
+    } else {
       apiUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?key=${API}&q=${stated.latitude},${stated.longitude}&format=json&num_of_days=7&extra=isDayTime&date=yes&includelocation=yes&tp=12&showlocaltime=yes&lang=ar`;
       fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        if (
-          data?.data?.current_condition?.length > 0 &&
-          data?.data?.nearest_area?.length > 0
-        ) {
-          const currentCondition = data.data.current_condition[0];
-          const nearestArea = data.data.nearest_area[0];
-          const forecast = data.data.weather;
-          console.log("region"+nearestArea.region[0].value);
-          setregion(nearestArea.region[0].value);
-
-       
-         
-
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching weather data:', error);
-        alert('An error occurred while fetching the data. Please try again.');
-      });
-
+        .then((response) => response.json())
+        .then((data) => {
+          if (
+            data?.data?.current_condition?.length > 0 &&
+            data?.data?.nearest_area?.length > 0
+          ) {
+            const nearestArea = data.data.nearest_area[0];
+            console.log("region" + nearestArea.region[0].value);
+            setregion(nearestArea.region[0].value);
+            navigate(`/city/${nearestArea.region[0].value}`);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching weather data:', error);
+          alert('An error occurred while fetching the data. Please try again.');
+        });
     }
-    
 
-    
     setSelectedState(state);
-    setSearchQuery(state);
   };
 
   // Handle Enter key press in search bar
@@ -265,7 +243,6 @@ function LandingDisplay({ coordinates }) {
       handleSearch();
     }
   };
-  
 
   return (
     <div
@@ -337,12 +314,12 @@ function LandingDisplay({ coordinates }) {
               </div>
               {/* Search Bar and States Dropdown */}
               <div className="flex justify-center rounded-l-lg mb-8">
-               <select
-                  value="none"
+                <select
+                  value={selectedState}
                   onChange={handleStateSelect}
                   className="rounded-l-lg bg-white bg-opacity-20 text-white focus:outline-none"
                 >
-                  <option value="none">Select City</option>
+                  <option value="">Select City</option>
                   {states.map((state) => (
                     <option key={state.isoCode} value={state.name} className='text-black'>
                       {state.name}
